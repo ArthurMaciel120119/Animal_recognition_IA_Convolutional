@@ -21,18 +21,20 @@ train_folder = current_dir + "\\Treino"
 val_folder = current_dir + "\\Validacao"
 test_folder = current_dir + "\\Test"
 
+class_names = ['SEMGADO', 'COMGADO']
+
 #Fazendo o "Dowload das imagens" para definir as que serão usadas para teste,validacao e treino
 train_dataset = image_dataset_from_directory(train_folder, 
-                                               image_size=(200,200),
-                                             batch_size=32) #quanto em quanto o peso sera ajustado
+                                            image_size=(200,200),
+                                            batch_size=32) #quanto em quanto o peso sera ajustado
 
 validation_dataset = image_dataset_from_directory(val_folder, 
-                                               image_size=(200,200),
-                                               batch_size=32)
+                                            image_size=(200,200),
+                                            batch_size=32)
 
 test_dataset = image_dataset_from_directory(test_folder, 
-                                               image_size=(200,200),
-                                               batch_size=32)
+                                            image_size=(200,200),
+                                            batch_size=32)
 
 #Visualizar os batchs
 for data_batch, labels_batch in train_dataset:
@@ -68,54 +70,75 @@ model.compile(loss="binary_crossentropy",
               metrics=["accuracy"])
 
 #Salva a melhor fase dos acertos da rede neural, sabe que é a melhor fase da rede por meio do numero de erros e acertos
-callbacks = [  
-    ModelCheckpoint(
-        filepath="model1.keras",
-        save_best_only=True,
-        monitor="val_loss"
-    )
-]
+#callbacks = [  
+#     ModelCheckpoint(
+#         filepath="model1.keras",
+#         save_best_only=True,
+#         monitor="val_loss"
+#     )
+# ]
 
 history = model.fit(
-    train_dataset,
-    epochs=1,
-    validation_data=validation_dataset,
-    callbacks=callbacks
-)
+     train_dataset,
+     epochs=10,
+     validation_data=validation_dataset,
+ )
 
 #Mostrar os resultados da rede em graficos para analisar estagnação ou overfiting
-# import matplotlib.pyplot as plt
-# accuracy = history.history["accuracy"]
-# val_accuracy = history.history["val_accuracy"]
-# loss = history.history["loss"]
-# val_loss = history.history["val_loss"]
-# epochs = range(1, len(accuracy)+1)
-# plt.plot(epochs, accuracy, "r", label="Treino acc")
-# plt.plot(epochs, val_accuracy, "b", label="Val acc")
-# plt.xlabel("Épocas")
-# plt.ylabel("%s")
-# plt.title("Acurácia de Treino e Validacao")
-# plt.legend()
-# plt.figure()
-# plt.plot(epochs, loss, "r", label="Treino loss")
-# plt.plot(epochs, loss, "b", label="Val loss")
-# plt.xlabel("Épocas")
-# plt.ylabel("%s")
-# plt.title("Loss de Treino e Validacao")
-# plt.legend()
-# plt.show()
+import matplotlib.pyplot as plt
+
+accuracy = history.history["accuracy"]
+val_accuracy = history.history["val_accuracy"]
+loss = history.history["loss"]
+val_loss = history.history["val_loss"]
+epochs = range(1, len(accuracy)+1)
+plt.plot(epochs, accuracy, "r", label="Treino acc")
+plt.plot(epochs, val_accuracy, "b", label="Val acc")
+plt.xlabel("Épocas")
+plt.ylabel("%s")
+plt.title("Acurácia de Treino e Validacao")
+plt.legend()
+plt.figure()
+plt.plot(epochs, loss, "r", label="Treino loss")
+plt.plot(epochs, loss, "b", label="Val loss")
+plt.xlabel("Épocas")
+plt.ylabel("%s")
+plt.title("Loss de Treino e Validacao")
+plt.legend()
+plt.show()
 
 model.summary()
 
-#Resultado dos Conjuntos de Teste
-from tensorflow import keras
-model = keras.models.load_model("model1.keras")
-test_loss, test_acc = model.evaluate(test_dataset)
-print(f"Test accuracy: {test_acc:.3f}")
+# Resultado dos Conjuntos de Teste
+# from tensorflow import keras
+# model = keras.models.load_model("model1.keras")
+# test_loss, test_acc = model.evaluate(test_dataset)
+# print(f"Test accuracy: {test_acc:.3f}")
+
+def plot_dataset_predictions(dataset) :
+    features, labels = dataset.as_numpy_iterator().next()
+    
+    predictions = model.predict_on_batch(features).flatten()
+    predictions = tf.where(predictions < 0.5, 0, 1)
+    
+    print('Labels-> %s' % labels)
+    print('Predictions-> %s' % predictions.numpy())
+    
+    plt.gcf().clear()
+    plt.figure(figsize = (15,15))
+    
+    for i in range(9) :
+        
+        plt.subplot(3, 3, i+1)
+        plt.axis('off')
+        
+        plt.inshow(features[i].astype('uint8'))
+        plt.title(class_names[predictions[i]])
+        
+plot_dataset_predictions(test_dataset)
 
 #Codigo para testar imagens baixadas por fora
 #Código para mostrar a imagem que sera testada na tela
-from matplotlib import pyplot as plt
 
 # def showSingleImage(img, title, size):
 #     fig, axis = plt.subplots(figsize = size)
@@ -126,24 +149,24 @@ from matplotlib import pyplot as plt
 
 # import cv2
 
-path = r'C:\Users\Arthu\OneDrive\Área de Trabalho\FACULDADE\gadin.jpg'
+#path = r'C:\Users\Arthu\OneDrive\Área de Trabalho\FACULDADE\gadin.jpg'
 # gado_img = cv2.imread(path)
 # gado_img = cv2.cvtColor(gado_img, cv2.COLOR_BGR2RGB)
 
 # showSingleImage(gado_img, "Gado", (476 , 708))
 
 #Código que testa a imagem e retorna o resultado
-from keras.preprocessing import image
-import numpy as np
+# from keras.preprocessing import image
+# import numpy as np
 
-gado_img = image.load_img(path, target_size=(200,200))
-x = image.img_to_array(gado_img)
-x = np.expand_dims(x, axis=0)
-pred = (model.predict(x) > 0,5).astype('int32')[0][0]
+# gado_img = image.load_img(path, target_size=(200,200))
+# x = image.img_to_array(gado_img)
+# x = np.expand_dims(x, axis=0)
+# pred = (model.predict(x) > 0,5).astype('int32')[0][0]
 
-if pred == 1 :
-    print("GADO")
-else :
-    print("SEM GADO")
+# if pred == 1 :
+#     print("GADO")
+# else :
+#     print("SEM GADO")
     
-print(model.predict(x))
+# print(model.predict(x))
