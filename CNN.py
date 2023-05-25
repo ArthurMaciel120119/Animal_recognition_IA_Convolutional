@@ -4,6 +4,7 @@
     # TECNICAS DE REGULARIZACAO PARA DEIXA A REDE MAIS INTELIGENTE
     
 import os
+import pickle
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow.keras.utils import image_dataset_from_directory
@@ -22,7 +23,7 @@ print(tf.config.list_physical_devices('GPU'))
 current_dir = "E:\IMAGENS_DATASETS"
 
 train_folder = current_dir + "\\Treino"
-val_folder = current_dir + "\\Validacao"
+val_folder = current_dir + "\\Validacao" 
 test_folder = current_dir + "\\Test"
 
 tamanho_train_folder_gados = len(os.listdir(os.path.join(train_folder,'gado')))
@@ -31,8 +32,8 @@ tamanho_train_folder_semgados = len(os.listdir(os.path.join(train_folder,'semgad
 tamanho_val_folder_gados = len(os.listdir(os.path.join(val_folder,'gado')))
 tamanho_val_folder_semgados = len(os.listdir(os.path.join(val_folder,'semgado')))
 
-tamanho_test_folder_gados = len(os.listdir(os.path.join(test_folder,'gado')))
-tamanho_test_folder_semgados = len(os.listdir(os.path.join(train_folder,'semgado')))
+tamanho_test_folder_gados = len(os.listdir(os.path.join(test_folder,'gado2')))
+tamanho_test_folder_semgados = len(os.listdir(os.path.join(test_folder,'semgado2')))
 
 print('Treino Gado: %s' % tamanho_train_folder_gados)
 print('Treino Sem Gado: %s' % tamanho_train_folder_semgados)
@@ -51,7 +52,7 @@ image_size = (image_width, image_height)
 image_shpae = image_size + (image_color_channel,)
 
 batch_size = 32
-epochs = 5
+epochs = 50
 learning_rate = 0.0001
 
 class_names = ['SEMGADO', 'COMGADO']
@@ -77,7 +78,7 @@ for data_batch, labels_batch in train_dataset:
     break
 
 #Modelo ALEXNET
-model = keras.Sequential() 
+# model = keras.Sequential() 
 
 # model.add (Conv2D(filters=96, kernel_size=11, strides=4, activation='relu')) 
 # model.add (MaxPooling2D(pool_size=3,strides=2)) 
@@ -99,7 +100,7 @@ model = keras.Sequential()
 # model.add (Dense(10))
 
 #Criando meu modelo e treinando ele
-# model = keras.Sequential() #API Sequencial -> mais simples, tanto para apredizado quanto funcionamento
+model = keras.Sequential() #API Sequencial -> mais simples, tanto para apredizado quanto funcionamento
 
 model.add (Rescaling(scale=1.0/255)) #Pegar cada cor da imagem e representar como 0 ou1 , para facilitar calculos etc.
 
@@ -122,7 +123,7 @@ model.add (Dense(256, activation="relu"))
 model.add (Dropout(0.5)) 
 model.add (Dense(1, activation="sigmoid")) #Dizer se é ou não gado
 
-
+#model_save = pickle.dumps(model)
 
 model.compile(loss="binary_crossentropy",
               optimizer=tf.keras.optimizers.Adam(learning_rate = learning_rate),
@@ -134,7 +135,7 @@ history = model.fit(
      validation_data=validation_dataset,
  )
 
-#Mostrar os resultados da rede em graficos para analisar estagnação ou overfiting
+# #Mostrar os resultados da rede em graficos para analisar estagnação ou overfiting
 
 accuracy = history.history["accuracy"]
 val_accuracy = history.history["val_accuracy"]
@@ -158,32 +159,32 @@ plt.show()
 
 
 test_loss, test_acc = model.evaluate(test_dataset)
-print(f"Acurácia Teste: {test_acc:.3f}")
+print(f"Acuracia Teste: {test_acc:.3f}")
 
 #model.summary()
 
-# def plot_dataset_predictions(dataset) :
+def plot_dataset_predictions(dataset) :
     
-#     features, labels = dataset.as_numpy_iterator().next()
+    features, labels = dataset.as_numpy_iterator().next()
     
-#     predictions = model.predict_on_batch(features).flatten()
-#     predictions = tf.where(predictions < 0.5, 0, 1)
+    predictions = model.predict_on_batch(features).flatten()
+    predictions = tf.where(predictions < 0.5, 0, 1)
     
-#     print('Labels-> %s' % labels)
-#     print('Predictions-> %s' % predictions.numpy())
+    print('Labels-> %s' % labels)
+    print('Predictions-> %s' % predictions.numpy())
     
-    #plt.gcf().clear()
-    #plt.figure(figsize = (15,15))
+    # plt.gcf().clear()
+    # plt.figure(figsize = (15,15))
     
-    # for i in range(9):
+    for i in range(9):
         
-    #     plt.subplot(3,3,i+1)
-    #     plt.axis('off')
+        # plt.subplot(3,3,i+1)
+        # plt.axis('off')
         
-    #     plt.imshow(features[i].astype('uint8'))
-    #     plt.title(class_names[predictions[i]])
+        # plt.imshow(features[i].astype('uint8'))
+        plt.title(class_names[predictions[i]])
     
-# plot_dataset_predictions(test_dataset)
+plot_dataset_predictions(test_dataset)
 
 # model.save('path/to/model')
 # model = tf.keras.models.load_model('path/to/model')
