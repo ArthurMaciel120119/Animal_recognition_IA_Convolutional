@@ -7,6 +7,9 @@ import os
 import pickle
 import matplotlib.pyplot as plt
 import tensorflow as tf
+from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
+import numpy as np
 from tensorflow.keras.utils import image_dataset_from_directory
 from tensorflow import keras
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
@@ -173,18 +176,34 @@ def plot_dataset_predictions(dataset) :
     print('Labels-> %s' % labels)
     print('Predictions-> %s' % predictions.numpy())
     
-    # plt.gcf().clear()
-    # plt.figure(figsize = (15,15))
-    
-    for i in range(9):
-        
-        # plt.subplot(3,3,i+1)
-        # plt.axis('off')
-        
-        # plt.imshow(features[i].astype('uint8'))
-        plt.title(class_names[predictions[i]])
-    
 plot_dataset_predictions(test_dataset)
+
+
+# Exemplo de rótulos verdadeiros e preditos
+y_true = [1, 0, 0, 1, 0, 1, 1, 0]
+y_pred = [1, 0, 1, 1, 0, 0, 1, 0]
+
+# Criar a matriz de confusão
+cm = confusion_matrix(y_true, y_pred)
+
+# Visualizar a matriz de confusão
+labels = np.unique(y_true)
+plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+plt.title('Matriz de Confusão')
+plt.colorbar()
+tick_marks = np.arange(len(labels))
+plt.xticks(tick_marks, labels)
+plt.yticks(tick_marks, labels)
+plt.xlabel('Rótulo Previsto')
+plt.ylabel('Rótulo Verdadeiro')
+
+# Adicionar os valores numericos nas células
+thresh = cm.max() / 2.
+for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+    plt.text(j, i, format(cm[i, j], 'd'), horizontalalignment="center", color="white" if cm[i, j] > thresh else "black")
+
+plt.show()
+
 
 # model.save('path/to/model')
 # model = tf.keras.models.load_model('path/to/model')
