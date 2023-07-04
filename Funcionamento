@@ -1,0 +1,6 @@
+O código em python importa todas as bilbiotecas necessárias logo no começo. As imagens são carregadas do computador, por meio de uma função da bilbioteca utilizada, apenas passando o endereço
+da pasta em que as imagens estão presentes. Após o carregamento das imagens, o código retorna quantas imagens estão sendo utilizadas para treino, validação e testes tanto as imagens utilizadas
+em cada classe quanto o número de imagens utilizadas em geral. Com isso, a implementação da rede neural é realizada, contendo ao todo 17 camadas, sendo 1 delas a de reescala, 5 convolucionais,
+5 max pooling, 3 drop out, 1 flatten e 2 densas. Depois das camadas implementadas, são definidas a forma de aprendizado e aprendizado da rede. Após a definição da forma de aprendizado, a rede
+começa a ser treinada, o número debépocas que a rede treinará é definida pelo próprio programador. Com o treinamento realizado, são gerados os gráficos de acerto e erros do treinamento
+e validação, e por fim, é gerado o gráfico da matriz confusão com os resultados.
