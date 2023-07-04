@@ -1,0 +1,2 @@
+Para utilizar o código do projeto é necessário a linguagem de programação Python na sua máquina, uma IDE capaz de rodar a linguagem e algumas bibliotecas.
+Em específico as bibliotecas necessárias são : keras para as camadas neurais, mat para "plotar" os gráficos
