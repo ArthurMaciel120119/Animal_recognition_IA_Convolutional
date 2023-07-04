@@ -1,2 +1,10 @@
 Para utilizar o código do projeto é necessário a linguagem de programação Python na sua máquina, uma IDE capaz de rodar a linguagem e algumas bibliotecas.
-Em específico as bibliotecas necessárias são : keras para as camadas neurais, mat para "plotar" os gráficos
+Em específico as bibliotecas necessárias são : tensorflow para usar keras e implementar camadas neurais, pickle para salvar o modelo da rede, matplotlib.pyplot para "plotar" os gráficos, 
+e sklearn.metrics para construir a matriz confusão com os resultados.
+
+import os
+import pickle
+import matplotlib.pyplot as plt
+import tensorflow as tf
+import matplotlib.pyplot as plt
+import numpy as np
